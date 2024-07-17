@@ -23,7 +23,7 @@ jobs:
                   fetch-depth: 0
             - name: Deploy
               run: |
-                  echo BUILD_ENV
+                  echo $BUILD_ENV
                   DEPLOY_ENV="deploying to dev $BUILD_ENV"
     post-deploy:
         name: Post deploy
@@ -33,7 +33,7 @@ jobs:
               with:
                   fetch-depth: 0
             - name: Post deploy
-              run: echo "Post deploy to dev $DEPLOY_ENV"
+              run: echo "Post deploy to dev ${DEPLOY_ENV}"
             - name: Create PR to temp branch
               uses: peter-evans/create-pull-request@v6
               with:

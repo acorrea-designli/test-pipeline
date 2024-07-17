@@ -23,8 +23,8 @@ jobs:
                   fetch-depth: 0
             - name: Deploy
               run: |
-                  echo BUILD_ENV
-                  DEPLOY_ENV="deploying to staging $BUILD_ENV"
+                  echo $BUILD_ENV
+                  DEPLOY_ENV="deploying to staging ${BUILD_ENV}"
     post-deploy:
         name: Post deploy
         runs-on: ubuntu-latest
