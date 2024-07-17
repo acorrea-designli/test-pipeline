@@ -52,7 +52,6 @@ jobs:
             - name: Create PR to main branch
               uses: peter-evans/create-pull-request@v6
               with:
-                  token: ${{ secrets.GITHUB_TOKEN }}
                   title: "Create main PR"
                   body: ${{ env.DEPLOY_ENV }}
                   branch: "staging"

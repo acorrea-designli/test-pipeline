@@ -52,7 +52,6 @@ jobs:
             - name: Create PR to temp branch
               uses: peter-evans/create-pull-request@v6
               with:
-                  token: ${{ secrets.GITHUB_TOKEN }}
                   title: "Create temp PR"
                   body: ${{ env.DEPLOY_ENV }}
                   branch: "develop"
@@ -61,7 +60,6 @@ jobs:
             - name: Create PR to temp staging branch
               uses: peter-evans/create-pull-request@v6
               with:
-                  token: ${{ secrets.GITHUB_TOKEN }}
                   title: "Create staging PR"
                   body: ${{ env.DEPLOY_ENV }}
                   branch: "develop"
