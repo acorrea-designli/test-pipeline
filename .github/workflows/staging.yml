@@ -40,7 +40,7 @@ jobs:
 
     create-main-pr:
         needs: deploy
-        name: Post deploy
+        name: Create main PR
         runs-on: ubuntu-latest
         env:
             DEPLOY_ENV: ${{ needs.deploy.outputs.DEPLOY_ENV }}
