@@ -53,4 +53,4 @@ jobs:
             - name: Create PR to temp branch
               run: gh pr create --base develop --head temp --title "Create temp PR" --body "${DEPLOY_ENV}"
             - name: Create PR to temp staging branch
-              run: gh pr create --base temp --head staging --title "Create staging PR" --body "${DEPLOY_ENV}"
+              run: gh pr create --base develop --head staging --title "Create staging PR" --body "${DEPLOY_ENV}"
