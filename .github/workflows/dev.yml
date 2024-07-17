@@ -43,6 +43,7 @@ jobs:
         runs-on: ubuntu-latest
         env:
             DEPLOY_ENV: ${{ needs.deploy.outputs.DEPLOY_ENV }}
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         steps:
             - uses: actions/checkout@v4
               with:
