@@ -50,4 +50,4 @@ jobs:
             - name: Post deploy
               run: echo "Post deploy to staging ${DEPLOY_ENV}"
             - name: Create PR to main branch
-              run: gh pr create --base staging --head main --title "Create main PR" --body $DEPLOY_ENV
+              run: gh pr create --base staging --head main --title "Create main PR" --body "${DEPLOY_ENV}"
