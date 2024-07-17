@@ -54,14 +54,14 @@ jobs:
               with:
                   title: "Create temp PR"
                   body: ${{ env.DEPLOY_ENV }}
-                  branch: "develop"
-                  base: "temp"
+                  branch: "temp"
+                  base: "develop"
                   labels: "automated"
             - name: Create PR to temp staging branch
               uses: peter-evans/create-pull-request@v6
               with:
                   title: "Create staging PR"
                   body: ${{ env.DEPLOY_ENV }}
-                  branch: "develop"
-                  base: "staging"
+                  branch: "staging"
+                  base: "develop"
                   labels: "automated"
