@@ -57,6 +57,7 @@ jobs:
               id: check-pr
               run: |
                   PR_ID=$(gh pr list --base ${{ env.BASE_BRANCH }} --head ${{ env.HEAD_BRANCH }} --json id --jq .[].id)
+                  echo $PR_ID
                   echo "PR_ID=${PR_ID}" >> $GITHUB_OUTPUT
             - if: ${{ steps.check-pr.outputs.PR_ID != null && steps.check-pr.outputs.PR_ID != '' }}
               name: Create ${{ env.HEAD_BRANCH }} -> ${{ env.BASE_BRANCH }} PR
