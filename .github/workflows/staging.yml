@@ -1,8 +1,8 @@
-name: Deploy dev environment
+name: Deploy staging environment
 
 on:
     push:
-        branches: [develop]
+        branches: [staging]
 
 jobs:
     build:
@@ -19,7 +19,6 @@ jobs:
                   echo "BUILD_ENV=installing dependencies" >> $GITHUB_OUTPUT
         outputs:
             BUILD_ENV: ${{ steps.build-step.outputs.BUILD_ENV }}
-
     deploy:
         needs: build
         name: deploy
@@ -34,44 +33,19 @@ jobs:
               id: deploy-step
               run: |
                   echo $BUILD_ENV
-                  echo "DEPLOY_ENV=deploying to dev ${BUILD_ENV}" >> $GITHUB_ENV
-                  echo "DEPLOY_ENV=deploying to dev ${BUILD_ENV}" >> $GITHUB_OUTPUT
+                  echo "DEPLOY_ENV=deploying to staging ${BUILD_ENV}" >> $GITHUB_ENV
+                  echo "DEPLOY_ENV=deploying to staging ${BUILD_ENV}" >> $GITHUB_OUTPUT
         outputs:
             DEPLOY_ENV: ${{ steps.deploy-step.outputs.DEPLOY_ENV }}
 
-    create-temp-pr:
+    create-main-pr:
         needs: deploy
-        name: Create temp PR
+        name: Create main PR
         runs-on: ubuntu-latest
         env:
             DEPLOY_ENV: ${{ needs.deploy.outputs.DEPLOY_ENV }}
             GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-            BASE_BRANCH: temp
-            HEAD_BRANCH: develop
-        steps:
-            - uses: actions/checkout@v4
-              with:
-                  fetch-depth: 0
-            - name: Post deploy
-              run: echo "Post deploy to dev ${DEPLOY_ENV}"
-            - name: Check if existing ${{ env.HEAD_BRANCH }} -> ${{ env.BASE_BRANCH }} PR exists
-              id: check-pr
-              run: |
-                  PR_ID=$(gh pr list --base ${{ env.BASE_BRANCH }} --head ${{ env.HEAD_BRANCH }} --json id --jq .[].id)
-                  echo $PR_ID
-                  echo "PR_ID=${PR_ID}" >> $GITHUB_OUTPUT
-            - if: ${{ steps.check-pr.outputs.PR_ID == null || steps.check-pr.outputs.PR_ID == '' }}
-              name: Create ${{ env.HEAD_BRANCH }} -> ${{ env.BASE_BRANCH }} PR
-              run: gh pr create --base ${{ env.BASE_BRANCH }} --head ${{ env.HEAD_BRANCH }} --title "Create ${{ env.BASE_BRANCH }} PR" --body "${DEPLOY_ENV}"
-
-    create-staging-pr:
-        needs: deploy
-        name: Create staging PR
-        runs-on: ubuntu-latest
-        env:
-            DEPLOY_ENV: ${{ needs.deploy.outputs.DEPLOY_ENV }}
-            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-            BASE_BRANCH: staging
+            BASE_BRANCH: main
             HEAD_BRANCH: develop
         steps:
             - uses: actions/checkout@v4
