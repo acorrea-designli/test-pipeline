@@ -46,7 +46,7 @@ jobs:
             DEPLOY_ENV: ${{ needs.deploy.outputs.DEPLOY_ENV }}
             GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
             BASE_BRANCH: main
-            HEAD_BRANCH: develop
+            HEAD_BRANCH: staging
         steps:
             - uses: actions/checkout@v4
               with:
