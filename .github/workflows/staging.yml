@@ -1,4 +1,4 @@
-name: Deploy dev environment
+name: Deploy staging environment
 
 on:
     push:
@@ -13,40 +13,47 @@ jobs:
               with:
                   fetch-depth: 0
             - name: Install dependencies
-              run: echo "BUILD_ENV=installing dependencies" >> $GITHUB_ENV
-            - name: Pass env to deploy
-              run: echo "BUILD_ENV=${BUILD_ENV}" >> $GITHUB_OUTPUT
+              id: build-step
+              run: |
+                  echo "BUILD_ENV=installing dependencies" >> $GITHUB_ENV
+                  echo "BUILD_ENV=installing dependencies" >> $GITHUB_OUTPUT
+        outputs:
+            BUILD_ENV: ${{ steps.build-step.outputs.BUILD_ENV }}
     deploy:
+        needs: build
         name: deploy
         runs-on: ubuntu-latest
         env:
-            BUILD_ENV: ${{ steps.build.outputs.BUILD_ENV }}
+            BUILD_ENV: ${{ needs.build.outputs.BUILD_ENV }}
         steps:
             - uses: actions/checkout@v4
               with:
                   fetch-depth: 0
             - name: Deploy
+              id: deploy-step
               run: |
                   echo $BUILD_ENV
                   echo "DEPLOY_ENV=deploying to staging ${BUILD_ENV}" >> $GITHUB_ENV
-            - name: Pass env to post-deploy
-              run: echo "DEPLOY_ENV=${DEPLOY_ENV}" >> $GITHUB_OUTPUT
+                  echo "DEPLOY_ENV=deploying to staging ${BUILD_ENV}" >> $GITHUB_OUTPUT
+        outputs:
+            DEPLOY_ENV: ${{ steps.deploy-step.outputs.DEPLOY_ENV }}
     post-deploy:
+        needs: deploy
         name: Post deploy
         runs-on: ubuntu-latest
         env:
-            DEPLOY_ENV: ${{ steps.build.outputs.DEPLOY_ENV }}
+            DEPLOY_ENV: ${{ needs.deploy.outputs.DEPLOY_ENV }}
         steps:
             - uses: actions/checkout@v4
               with:
                   fetch-depth: 0
             - name: Post deploy
               run: echo "Post deploy to staging ${DEPLOY_ENV}"
-            - name: Create PR to temp branch
+            - name: Create PR to main branch
               uses: peter-evans/create-pull-request@v6
               with:
                   token: ${{ secrets.GITHUB_TOKEN }}
-                  title: "Create temp PR"
+                  title: "Create main PR"
                   body: ${{ env.DEPLOY_ENV }}
                   branch: "staging"
                   base: "main"
