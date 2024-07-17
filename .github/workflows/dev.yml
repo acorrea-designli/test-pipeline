@@ -19,6 +19,7 @@ jobs:
                   echo "BUILD_ENV=installing dependencies" >> $GITHUB_OUTPUT
         outputs:
             BUILD_ENV: ${{ steps.build-step.outputs.BUILD_ENV }}
+
     deploy:
         needs: build
         name: deploy
@@ -37,20 +38,51 @@ jobs:
                   echo "DEPLOY_ENV=deploying to dev ${BUILD_ENV}" >> $GITHUB_OUTPUT
         outputs:
             DEPLOY_ENV: ${{ steps.deploy-step.outputs.DEPLOY_ENV }}
-    post-deploy:
+
+    create-temp-pr:
         needs: deploy
         name: Post deploy
         runs-on: ubuntu-latest
         env:
             DEPLOY_ENV: ${{ needs.deploy.outputs.DEPLOY_ENV }}
             GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+            BASE_BRANCH: temp
+            HEAD_BRANCH: develop
         steps:
             - uses: actions/checkout@v4
               with:
                   fetch-depth: 0
             - name: Post deploy
               run: echo "Post deploy to dev ${DEPLOY_ENV}"
-            - name: Create PR to temp branch
-              run: gh pr create --base temp --head develop --title "Create temp PR" --body "${DEPLOY_ENV}"
-            - name: Create PR to temp staging branch
-              run: gh pr create --base staging --head develop --title "Create staging PR" --body "${DEPLOY_ENV}"
+            - name: Check if existing ${{ env.HEAD_BRANCH }} -> ${{ env.BASE_BRANCH }} PR exists
+              id: check-pr
+              run: |
+                  PR_ID=gh pr list -B ${{ env.BASE_BRANCH }} -H ${{ env.HEAD_BRANCH }} --json id --jq .[].id
+                  echo "PR_ID=${PR_ID}" >> $GITHUB_OUTPUT
+            - if: ${{ steps.check-pr.outputs.PR_ID != null && steps.check-pr.outputs.PR_ID != '' }}
+              name: Create ${{ env.HEAD_BRANCH }} -> ${{ env.BASE_BRANCH }} PR
+              run: gh pr create -B ${{ env.BASE_BRANCH }} -H ${{ env.HEAD_BRANCH }} --title "Create ${{ env.BASE_BRANCH }} PR" --body "${DEPLOY_ENV}"
+
+    create-staging-pr:
+        needs: deploy
+        name: Post deploy
+        runs-on: ubuntu-latest
+        env:
+            DEPLOY_ENV: ${{ needs.deploy.outputs.DEPLOY_ENV }}
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+            BASE_BRANCH: staging
+            HEAD_BRANCH: develop
+        steps:
+            - uses: actions/checkout@v4
+              with:
+                  fetch-depth: 0
+            - name: Post deploy
+              run: echo "Post deploy to dev ${DEPLOY_ENV}"
+            - name: Check if existing ${{ env.HEAD_BRANCH }} -> ${{ env.BASE_BRANCH }} PR exists
+              id: check-pr
+              run: |
+                  PR_ID=gh pr list -B ${{ env.BASE_BRANCH }} -H ${{ env.HEAD_BRANCH }} --json id --jq .[].id
+                  echo "PR_ID=${PR_ID}" >> $GITHUB_OUTPUT
+            - if: ${{ steps.check-pr.outputs.PR_ID != null && steps.check-pr.outputs.PR_ID != '' }}
+              name: Create ${{ env.HEAD_BRANCH }} -> ${{ env.BASE_BRANCH }} PR
+              run: gh pr create -B ${{ env.BASE_BRANCH }} -H ${{ env.HEAD_BRANCH }} --title "Create ${{ env.BASE_BRANCH }} PR" --body "${DEPLOY_ENV}"
