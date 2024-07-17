@@ -2,7 +2,7 @@ name: Deploy dev environment
 
 on:
     push:
-        branches: [develop]
+        branches: [staging]
 
 jobs:
     build:
@@ -24,7 +24,7 @@ jobs:
             - name: Deploy
               run: |
                   echo BUILD_ENV
-                  DEPLOY_ENV="deploying to dev $BUILD_ENV"
+                  DEPLOY_ENV="deploying to staging $BUILD_ENV"
     post-deploy:
         name: Post deploy
         runs-on: ubuntu-latest
@@ -33,22 +33,13 @@ jobs:
               with:
                   fetch-depth: 0
             - name: Post deploy
-              run: echo "Post deploy to dev $DEPLOY_ENV"
+              run: echo "Post deploy to staging $DEPLOY_ENV"
             - name: Create PR to temp branch
               uses: peter-evans/create-pull-request@v6
               with:
                   token: ${{ secrets.GITHUB_TOKEN }}
                   title: "Create temp PR"
                   body: ${{ env.DEPLOY_ENV }}
-                  branch: "develop"
-                  base: "temp"
-                  labels: "automated"
-            - name: Create PR to temp staging branch
-              uses: peter-evans/create-pull-request@v6
-              with:
-                  token: ${{ secrets.GITHUB_TOKEN }}
-                  title: "Create staging PR"
-                  body: ${{ env.DEPLOY_ENV }}
-                  branch: "develop"
-                  base: "staging"
+                  branch: "staging"
+                  base: "main"
                   labels: "automated"
