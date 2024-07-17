@@ -54,6 +54,6 @@ jobs:
               with:
                   title: "Create main PR"
                   body: ${{ env.DEPLOY_ENV }}
-                  branch: "staging"
-                  base: "main"
+                  branch: "main"
+                  base: "staging"
                   labels: "automated"
