@@ -19,6 +19,8 @@ jobs:
     deploy:
         name: deploy
         runs-on: ubuntu-latest
+        env:
+            BUILD_ENV: ${{ steps.build.outputs.BUILD_ENV }}
         steps:
             - uses: actions/checkout@v4
               with:
