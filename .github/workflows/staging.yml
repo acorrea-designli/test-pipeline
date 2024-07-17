@@ -50,10 +50,4 @@ jobs:
             - name: Post deploy
               run: echo "Post deploy to staging ${DEPLOY_ENV}"
             - name: Create PR to main branch
-              uses: peter-evans/create-pull-request@v6
-              with:
-                  title: "Create main PR"
-                  body: ${{ env.DEPLOY_ENV }}
-                  branch: "main"
-                  base: "staging"
-                  labels: "automated"
+              run: gh pr create --base staging --head main --title "Create main PR" --body $DEPLOY_ENV

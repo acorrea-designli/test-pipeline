@@ -50,18 +50,6 @@ jobs:
             - name: Post deploy
               run: echo "Post deploy to dev ${DEPLOY_ENV}"
             - name: Create PR to temp branch
-              uses: peter-evans/create-pull-request@v6
-              with:
-                  title: "Create temp PR"
-                  body: ${{ env.DEPLOY_ENV }}
-                  branch: "temp"
-                  base: "develop"
-                  labels: "automated"
+              run: gh pr create --base develop --head temp --title "Create temp PR" --body $DEPLOY_ENV
             - name: Create PR to temp staging branch
-              uses: peter-evans/create-pull-request@v6
-              with:
-                  title: "Create staging PR"
-                  body: ${{ env.DEPLOY_ENV }}
-                  branch: "staging"
-                  base: "develop"
-                  labels: "automated"
+              run: gh pr create --base temp --head staging --title "Create staging PR" --body $DEPLOY_ENV
